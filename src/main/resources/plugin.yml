@@ -1,3 +1,4 @@
 name: GrassCombat
 version: ${project.version}
 main: life.grass.grasscombat.GrassCombat
+depend: [GrassItem]
