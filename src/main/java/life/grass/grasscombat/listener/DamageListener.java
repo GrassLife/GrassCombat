@@ -4,6 +4,7 @@ import life.grass.grasscombat.Caster;
 import life.grass.grasscombat.DressedEntity;
 import life.grass.grasscombat.GrassCombat;
 import life.grass.grasscombat.datatype.ArmorDataType;
+import life.grass.grasscombat.datatype.WeaponDataType;
 import life.grass.grasscombat.utils.DamageUtil;
 import life.grass.grasscombat.utils.Vector3D;
 import life.grass.grasscombat.utils.VectorUtil;
@@ -54,10 +55,5 @@ public class DamageListener implements Listener {
     public void damageEntity(LivingEntity damager) {
         Caster caster = new Caster(damager);
         caster.attack();
-    }
-
-    @EventHandler
-    public void onDamageEntityByEntity(EntityDamageByEntityEvent e) {
-
     }
 }

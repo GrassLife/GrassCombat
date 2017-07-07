@@ -7,7 +7,7 @@ public enum WeaponDataType {
     ATTACK_DAMAGE("AttackDamage", 1.0),
     ATTACK_RANGE("AttackRange", 20.0),
     ATTACK_REACH("AttackReach", 4.0),
-    ATTACK_WIDTH("AttackWidth", 100.0),
+    ATTACK_WIDTH("AttackWidth", 1.0),
     ATTACK_INTERVAL("AttackInterval", 20.0),
     KNOCKBACK_POWER("KnockBackPower", 1.0);
 

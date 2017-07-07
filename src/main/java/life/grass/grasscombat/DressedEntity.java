@@ -8,6 +8,10 @@ import life.grass.grassitem.JsonHandler;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by ecila on 2017/07/04.
  */
@@ -27,17 +31,26 @@ public class DressedEntity {
     }
 
     public double getWeaponData(WeaponDataType type) {
-        // TODO 性能を反映
         GrassJsonDataValue data = getDynamicValue(entity.getEquipment().getItemInMainHand(), type.getKey());
-        return data != null ? data.getAsMaskedDouble().orElse(type.getDefaultData()) : type.getDefaultData();
+        double damage = data != null ? data.getAsMaskedDouble().orElse(type.getDefaultData()) : type.getDefaultData();
+        damage += getArmorData(ArmorDataType.BONUS_ATTACK_DAMAGE);
+        return damage;
     }
 
     public double getArmorData(ArmorDataType type) {
         double result = 0.0;
-        for(ItemStack item: entity.getEquipment().getArmorContents()) {
+        List<ItemStack> items = new ArrayList<>();
+        items.addAll(Arrays.asList(entity.getEquipment().getArmorContents()));
+        items.add(entity.getEquipment().getItemInMainHand());
+        items.add(entity.getEquipment().getItemInOffHand());
+        for(ItemStack item: items) {
             GrassJsonDataValue data = getDynamicValue(item, type.getKey());
-            result += data != null ? data.getAsMaskedDouble().orElse(type.getDefaultData()) : type.getDefaultData();
+            result += (data != null ? data.getAsMaskedDouble().orElse(type.getDefaultData()) : type.getDefaultData()) * (getGrassJson(item) != null ? getGrassJson(item).getJsonReader().getEffectRate() : 1.0);
         }
         return result;
+    }
+
+    public GrassJson getGrassItemInMainHand() {
+        return getGrassJson(entity.getEquipment().getItemInMainHand());
     }
 }

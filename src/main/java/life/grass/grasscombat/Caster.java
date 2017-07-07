@@ -5,10 +5,13 @@ import life.grass.grasscombat.datatype.WeaponDataType;
 import life.grass.grasscombat.utils.DamageUtil;
 import life.grass.grasscombat.utils.Vector3D;
 import life.grass.grasscombat.utils.VectorUtil;
+import life.grass.grassitem.JsonHandler;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
@@ -75,9 +78,18 @@ public class Caster extends DressedEntity{
         target.setVelocity(livingEntity.getEyeLocation().getDirection().multiply(0.2 * knockback).setY(0.3));
 
         DressedEntity de = new DressedEntity(target);
-        System.out.println("軽減前" + damage);
+
+        if(isPlayer && getGrassItemInMainHand() != null) {
+            damage *= getGrassItemInMainHand().getJsonReader().getEffectRate();
+            Player player = (Player) livingEntity;
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if(item != null || !item.getData().getItemType().equals(Material.AIR)) {
+                item = JsonHandler.damageItem(item);
+                player.getInventory().setItemInMainHand(item);
+                player.updateInventory();
+            }
+        }
         damage = DamageUtil.getDefencedDamage(damage, de.getArmorData(ArmorDataType.DEFENCE), de.getArmorData(ArmorDataType.PROTECTION) );
-        System.out.println("軽減後" + damage);
 
         if(damage < target.getHealth()) {
             target.setHealth(target.getHealth() - damage);

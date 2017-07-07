@@ -6,7 +6,8 @@ package life.grass.grasscombat.datatype;
 public enum ArmorDataType {
     DEFENCE("Defence", 0.0),
     PROTECTION("Protection", 0.0),
-    MAGIC_DEFENCE("MagicDefence", 0.0);
+    MAGIC_DEFENCE("MagicDefence", 0.0),
+    BONUS_ATTACK_DAMAGE("BonusAttackDamage", 0.0);
 
     private String key;
     private double defaultData;

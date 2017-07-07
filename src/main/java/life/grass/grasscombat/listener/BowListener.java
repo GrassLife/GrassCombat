@@ -4,9 +4,7 @@ import life.grass.grasscombat.DressedEntity;
 import life.grass.grasscombat.datatype.ArmorDataType;
 import life.grass.grasscombat.datatype.WeaponDataType;
 import life.grass.grasscombat.utils.DamageUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 /**
  * Created by ecila on 2017/07/04.
@@ -26,7 +23,9 @@ public class BowListener implements Listener{
             Arrow arrow = (Arrow) e.getProjectile();
             DressedEntity de = new DressedEntity(e.getEntity());
             if(e.getEntity() instanceof Player) arrow.setVelocity(arrow.getVelocity().multiply(Math.pow(de.getWeaponData(WeaponDataType.ATTACK_RANGE), 0.5) / 5.0));
-            arrow.addScoreboardTag(de.getWeaponData(WeaponDataType.ATTACK_DAMAGE) + "," + e.getForce());
+            arrow.addScoreboardTag(
+                    (de.getWeaponData(WeaponDataType.ATTACK_DAMAGE) * (de.getGrassItemInMainHand() != null ? de.getGrassItemInMainHand().getJsonReader().getEffectRate() : 1.0))
+                            + "," + e.getForce());
         }
     }
 
