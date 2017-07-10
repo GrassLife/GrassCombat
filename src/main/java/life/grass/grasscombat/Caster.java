@@ -33,7 +33,7 @@ public class Caster extends DressedEntity{
         this.isPlayer = entity instanceof Player;
     }
 
-    public List<LivingEntity> getEyeLineEntiteis(double range, double expanding) {
+    public List<LivingEntity> getEyeLineEntities(double range, double expanding) {
         List<LivingEntity> list = new ArrayList<>();
         Location observerPos = livingEntity.getEyeLocation();
         Vector3D observerDir = new Vector3D(observerPos.getDirection());
@@ -106,7 +106,7 @@ public class Caster extends DressedEntity{
         double reach = getWeaponData(WeaponDataType.ATTACK_REACH);
         double expanding = getWeaponData(WeaponDataType.ATTACK_WIDTH);
 
-        for(LivingEntity target: getEyeLineEntiteis(reach, expanding)) {
+        for(LivingEntity target: getEyeLineEntities(reach, expanding)) {
             damage(target);
         }
     }
