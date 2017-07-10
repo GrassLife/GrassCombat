@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,8 @@ public class Caster extends DressedEntity{
         if(!target.getWorld().getPVP() && isPlayer && target instanceof Player) return false;
 
         if(target.hasMetadata(livingEntity.getUniqueId() + LAST_DAMAGE_TICK)) {
-            if(target.getMetadata(livingEntity.getUniqueId() + LAST_DAMAGE_TICK).get(0).asLong() > target.getWorld().getFullTime()
+            List<MetadataValue> meta = target.getMetadata(livingEntity.getUniqueId() + LAST_DAMAGE_TICK);
+            if(meta.size() > 0  && meta.get(0).asLong() > target.getWorld().getFullTime()
                     && Math.abs(target.getMetadata(livingEntity.getUniqueId() + LAST_DAMAGE_TICK).get(0).asLong() - target.getWorld().getFullTime()) < 1000L)
                 return false;
         }
