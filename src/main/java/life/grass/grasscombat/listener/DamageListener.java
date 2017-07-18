@@ -39,7 +39,6 @@ public class DamageListener implements Listener {
     public void onDamage(EntityDamageEvent e) {
         if (e.getEntity() instanceof LivingEntity) {
             double damage = e.getDamage();
-            System.out.println(e.getCause());
             DressedEntity de = new DressedEntity((LivingEntity) e.getEntity());
             if (e.getCause().equals(DamageCause.MAGIC)) {
                 damage = DamageUtil.getDefencedDamage(damage, de.getArmorData(ArmorDataType.MAGIC_DEFENCE), de.getArmorData(ArmorDataType.PROTECTION));

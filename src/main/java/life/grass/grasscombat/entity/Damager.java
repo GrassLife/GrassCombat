@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -88,6 +89,9 @@ public class Damager extends DressedEntity {
         victim.causeKnockBackFrom(livingEntity.getLocation(), knockback);
         victim.causeDamage(damage, livingEntity, DamageType.BASIC_DAMAGE);
         victim.setTimeStamp(livingEntity, attackInterval);
+        if(target instanceof Creature) {
+            ((Creature) target).setTarget(livingEntity);
+        }
     }
 
     public void attack() {

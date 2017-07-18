@@ -7,8 +7,6 @@ import life.grass.grasscombat.utils.DamageUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
@@ -23,6 +21,7 @@ public class Victim extends DressedEntity {
     private boolean isPlayer;
 
     private static String LAST_DAMAGE_TICK = "LastDamageTick";
+    private static String TOTAL_DAMAGE_BY_PLAYER = "TotalDamageByPlayer";
 
     public Victim(LivingEntity entity) {
         super(entity);
@@ -31,9 +30,16 @@ public class Victim extends DressedEntity {
     }
 
     public void causeRawDamage(double amount) {
+        double totalDamage = 0.0;
+        if(livingEntity.hasMetadata(TOTAL_DAMAGE_BY_PLAYER)) {
+            totalDamage += livingEntity.getMetadata(TOTAL_DAMAGE_BY_PLAYER).get(0).asDouble();
+        }
+
         if(amount < livingEntity.getHealth()) {
+            livingEntity.setMetadata(TOTAL_DAMAGE_BY_PLAYER, new FixedMetadataValue(GrassCombat.getInstance(), totalDamage + amount));
             livingEntity.setHealth(livingEntity.getHealth() - amount);
         } else {
+            livingEntity.setMetadata(TOTAL_DAMAGE_BY_PLAYER, new FixedMetadataValue(GrassCombat.getInstance(), totalDamage + livingEntity.getHealth()));
             livingEntity.setHealth(0);
         }
     }
@@ -73,5 +79,14 @@ public class Victim extends DressedEntity {
     public void causeRawKnockBackFrom(Location location, double power) {
         Vector vector = livingEntity.getLocation().toVector().subtract(location.toVector()).normalize();
         livingEntity.setVelocity(vector.multiply(0.2 * power));
+    }
+
+    public boolean isDroppable() {
+        if(livingEntity.hasMetadata(TOTAL_DAMAGE_BY_PLAYER)) {
+            double damage = livingEntity.getMetadata(TOTAL_DAMAGE_BY_PLAYER).get(0).asDouble();
+            return damage >= (livingEntity.getMaxHealth() / 2.0);
+        } else {
+            return false;
+        }
     }
 }
