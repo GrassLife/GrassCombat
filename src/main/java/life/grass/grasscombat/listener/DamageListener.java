@@ -1,15 +1,9 @@
 package life.grass.grasscombat.listener;
 
-import life.grass.grasscombat.Caster;
-import life.grass.grasscombat.DressedEntity;
-import life.grass.grasscombat.GrassCombat;
+import life.grass.grasscombat.entity.Damager;
+import life.grass.grasscombat.entity.DressedEntity;
 import life.grass.grasscombat.datatype.ArmorDataType;
-import life.grass.grasscombat.datatype.WeaponDataType;
 import life.grass.grasscombat.utils.DamageUtil;
-import life.grass.grasscombat.utils.Vector3D;
-import life.grass.grasscombat.utils.VectorUtil;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,7 +13,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  * Created by ecila on 2017/07/03.
@@ -53,7 +46,7 @@ public class DamageListener implements Listener {
     }
 
     public void damageEntity(LivingEntity damager) {
-        Caster caster = new Caster(damager);
+        Damager caster = new Damager(damager);
         caster.attack();
     }
 }

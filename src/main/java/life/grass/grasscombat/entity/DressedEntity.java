@@ -1,4 +1,4 @@
-package life.grass.grasscombat;
+package life.grass.grasscombat.entity;
 
 import life.grass.grasscombat.datatype.ArmorDataType;
 import life.grass.grasscombat.datatype.WeaponDataType;

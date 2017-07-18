@@ -1,6 +1,6 @@
 package life.grass.grasscombat.listener;
 
-import life.grass.grasscombat.DressedEntity;
+import life.grass.grasscombat.entity.DressedEntity;
 import life.grass.grasscombat.datatype.ArmorDataType;
 import life.grass.grasscombat.datatype.WeaponDataType;
 import life.grass.grasscombat.utils.DamageUtil;

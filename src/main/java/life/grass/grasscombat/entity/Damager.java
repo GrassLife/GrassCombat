@@ -1,19 +1,21 @@
-package life.grass.grasscombat;
+package life.grass.grasscombat.entity;
 
-import life.grass.grasscombat.datatype.ArmorDataType;
+import life.grass.grasscombat.GrassCombat;
+import life.grass.grasscombat.datatype.DamageType;
 import life.grass.grasscombat.datatype.WeaponDataType;
-import life.grass.grasscombat.utils.DamageUtil;
 import life.grass.grasscombat.utils.Vector3D;
 import life.grass.grasscombat.utils.VectorUtil;
 import life.grass.grassitem.JsonHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +23,11 @@ import java.util.List;
 /**
  * Created by ecila on 2017/07/04.
  */
-public class Caster extends DressedEntity{
+public class Damager extends DressedEntity {
     private LivingEntity livingEntity;
     private boolean isPlayer;
 
-    private static String LAST_DAMAGE_TICK = "LastDamageTick";
-
-    public Caster(LivingEntity entity) {
+    public Damager(LivingEntity entity) {
         super(entity);
         this.livingEntity = entity;
         this.isPlayer = entity instanceof Player;
@@ -59,13 +59,8 @@ public class Caster extends DressedEntity{
         if(target.isDead() || target.isInvulnerable()) return false;
         if(!target.getWorld().getPVP() && isPlayer && target instanceof Player) return false;
 
-        if(target.hasMetadata(livingEntity.getUniqueId() + LAST_DAMAGE_TICK)) {
-            List<MetadataValue> meta = target.getMetadata(livingEntity.getUniqueId() + LAST_DAMAGE_TICK);
-            if(meta.size() > 0  && meta.get(0).asLong() > target.getWorld().getFullTime()
-                    && Math.abs(target.getMetadata(livingEntity.getUniqueId() + LAST_DAMAGE_TICK).get(0).asLong() - target.getWorld().getFullTime()) < 1000L)
-                return false;
-        }
-        return true;
+        Victim victim = new Victim(target);
+        return victim.canDamageBy(livingEntity);
     }
 
     public void damage(LivingEntity target) {
@@ -77,9 +72,6 @@ public class Caster extends DressedEntity{
 
         target.damage(0);
         if(isPlayer && ((Player)livingEntity).isSprinting()) knockback += 2.0;
-        target.setVelocity(livingEntity.getEyeLocation().getDirection().multiply(0.2 * knockback).setY(0.3));
-
-        DressedEntity de = new DressedEntity(target);
 
         if(isPlayer && getGrassItemInMainHand() != null) {
             damage *= getGrassItemInMainHand().getJsonReader().getEffectRate();
@@ -91,15 +83,11 @@ public class Caster extends DressedEntity{
                 player.updateInventory();
             }
         }
-        damage = DamageUtil.getDefencedDamage(damage, de.getArmorData(ArmorDataType.DEFENCE), de.getArmorData(ArmorDataType.PROTECTION) );
 
-        if(damage < target.getHealth()) {
-            target.setHealth(target.getHealth() - damage);
-        } else {
-            target.setHealth(0);
-        }
-        long ldt = target.getWorld().getFullTime() + (long) attackInterval;
-        target.setMetadata(livingEntity.getUniqueId() + LAST_DAMAGE_TICK, new FixedMetadataValue(GrassCombat.getInstance(), ldt));
+        Victim victim = new Victim(target);
+        victim.causeKnockBackFrom(livingEntity.getLocation(), knockback);
+        victim.causeDamage(damage, livingEntity, DamageType.BASIC_DAMAGE);
+        victim.setTimeStamp(livingEntity, attackInterval);
     }
 
     public void attack() {
@@ -109,6 +97,39 @@ public class Caster extends DressedEntity{
         for(LivingEntity target: getEyeLineEntities(reach, expanding)) {
             damage(target);
         }
+    }
+
+    public void castFireBolt(Location point, Location target) {
+        Location location = point.add(0, 1.7, 0).clone();
+        Vector vec = target.add(0, 1.0, 0).toVector().subtract(point.toVector()).normalize();
+        World world = point.getWorld();
+//        Vector vec = target.toVector().add(point.toVector()).normalize();
+        new BukkitRunnable() {
+            double space = 0;
+            @Override
+            public void run() {
+                double x = space * vec.getX();
+                double y = space * vec.getY() - space * space / 5.0;
+                double z = space * vec.getZ();
+                location.add(x, y, z);
+                if (15.0 < space
+                        || location.getBlock().getType() != Material.AIR
+                        || world.getNearbyEntities(location, 0.7, 0.7, 0.7).stream().filter(entity -> entity instanceof LivingEntity).toArray().length != 0) {
+                    world.getNearbyEntities(location, 0.7, 0.7, 0.7).stream()
+                            .filter(entity -> entity instanceof LivingEntity)
+                            .forEach(player -> {
+                                ((LivingEntity) player).damage(4.0);
+                            });
+                    world.spawnParticle(Particle.EXPLOSION_LARGE, location, 1);
+                    world.spawnParticle(Particle.FIREWORKS_SPARK, location, 16, 0.1, 0.1, 0.1, 0.05);
+                    world.spawnParticle(Particle.LAVA, location, 6, 0, 0, 0, 0.2);
+                    cancel();
+                }
+                world.spawnParticle(Particle.FLAME, location, 9, 0.1, 0.05, 0.1, 0.02);
+                world.spawnParticle(Particle.SMOKE_NORMAL, location, 2, 0, 0, 0, 0);
+                space += 0.2;
+            }
+        }.runTaskTimer(GrassCombat.getInstance(), 0, 1);
     }
 
     public LivingEntity getLivingEntity() {
