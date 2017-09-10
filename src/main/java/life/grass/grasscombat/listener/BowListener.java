@@ -1,8 +1,10 @@
 package life.grass.grasscombat.listener;
 
+import life.grass.grasscombat.datatype.DamageType;
 import life.grass.grasscombat.entity.DressedEntity;
 import life.grass.grasscombat.datatype.ArmorDataType;
 import life.grass.grasscombat.datatype.WeaponDataType;
+import life.grass.grasscombat.entity.Victim;
 import life.grass.grasscombat.utils.DamageUtil;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
@@ -38,7 +40,13 @@ public class BowListener implements Listener{
                 DressedEntity de = new DressedEntity((LivingEntity) e.getEntity());
                 damage = DamageUtil.getDefencedDamage(damage, de.getArmorData(ArmorDataType.DEFENCE), de.getArmorData(ArmorDataType.PROTECTION));
             }
-            e.setDamage(EntityDamageEvent.DamageModifier.ARMOR, 0.0);
+            if(e.getEntity() instanceof LivingEntity) {
+                e.setDamage(EntityDamageEvent.DamageModifier.ARMOR, 0.0);
+                LivingEntity le = (LivingEntity) e.getEntity();
+                Victim victim = new Victim(le);
+                victim.causeDamage(damage, DamageType.BASIC_DAMAGE);
+            }
+
             e.setDamage(damage);
         }
     }

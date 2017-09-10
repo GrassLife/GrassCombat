@@ -44,7 +44,7 @@ public class Victim extends DressedEntity {
         }
     }
 
-    public void causeDamage(double amount, LivingEntity damager, DamageType type) {
+    public void causeDamage(double amount, DamageType type) {
         double damage = 0.0;
         if(type.equals(DamageType.BASIC_DAMAGE)) {
             damage = DamageUtil.getDefencedDamage(amount, getArmorData(ArmorDataType.DEFENCE), getArmorData(ArmorDataType.PROTECTION));

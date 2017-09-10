@@ -87,7 +87,7 @@ public class Damager extends DressedEntity {
 
         Victim victim = new Victim(target);
         victim.causeKnockBackFrom(livingEntity.getLocation(), knockback);
-        victim.causeDamage(damage, livingEntity, DamageType.BASIC_DAMAGE);
+        victim.causeDamage(damage, DamageType.BASIC_DAMAGE);
         victim.setTimeStamp(livingEntity, attackInterval);
         if(target instanceof Creature) {
             ((Creature) target).setTarget(livingEntity);
