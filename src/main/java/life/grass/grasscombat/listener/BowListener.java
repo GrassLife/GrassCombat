@@ -42,6 +42,7 @@ public class BowListener implements Listener{
             }
             if(e.getEntity() instanceof LivingEntity) {
                 e.setDamage(EntityDamageEvent.DamageModifier.ARMOR, 0.0);
+                e.setDamage(0);
                 LivingEntity le = (LivingEntity) e.getEntity();
                 Victim victim = new Victim(le);
                 victim.causeDamage(damage, DamageType.BASIC_DAMAGE);
