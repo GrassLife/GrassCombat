@@ -6,6 +6,9 @@ import life.grass.grasscombat.datatype.ArmorDataType;
 import life.grass.grasscombat.datatype.WeaponDataType;
 import life.grass.grasscombat.entity.Victim;
 import life.grass.grasscombat.utils.DamageUtil;
+import life.grass.grassitem.GrassJson;
+import life.grass.grassitem.ItemData.WeaponSkill;
+import life.grass.grassitem.JsonHandler;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,9 +27,19 @@ public class BowListener implements Listener{
         if(e.getProjectile() instanceof Arrow) {
             Arrow arrow = (Arrow) e.getProjectile();
             DressedEntity de = new DressedEntity(e.getEntity());
-            if(e.getEntity() instanceof Player) arrow.setVelocity(arrow.getVelocity().multiply(Math.pow(de.getWeaponData(WeaponDataType.ATTACK_RANGE), 0.5) / 5.0));
+            double damage = de.getWeaponData(WeaponDataType.ATTACK_DAMAGE);
+            if(e.getEntity() instanceof Player) {
+                arrow.setVelocity(arrow.getVelocity().multiply(Math.pow(de.getWeaponData(WeaponDataType.ATTACK_RANGE), 0.5) / 5.0));
+                GrassJson grassJson = de.getGrassItemInMainHand();
+                if(grassJson.hasDynamicValue("WeaponSkill/Type")) {
+                    WeaponSkill skill = WeaponSkill.getSkill(grassJson.getDynamicValue("WeaponSkill/Type").getAsMaskedString().orElse(""));
+                    double bonus = skill.apply((Player) e.getEntity());
+                    System.out.println("Bonus" + bonus);
+                    damage += bonus;
+                }
+            }
             arrow.addScoreboardTag(
-                    (de.getWeaponData(WeaponDataType.ATTACK_DAMAGE) * (de.getGrassItemInMainHand() != null ? de.getGrassItemInMainHand().getJsonReader().getEffectRate() : 1.0))
+                    (damage * (de.getGrassItemInMainHand() != null ? de.getGrassItemInMainHand().getJsonReader().getEffectRate() : 1.0))
                             + "," + e.getForce());
         }
     }

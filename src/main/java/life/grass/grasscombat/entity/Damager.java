@@ -5,6 +5,10 @@ import life.grass.grasscombat.datatype.DamageType;
 import life.grass.grasscombat.datatype.WeaponDataType;
 import life.grass.grasscombat.utils.Vector3D;
 import life.grass.grasscombat.utils.VectorUtil;
+import life.grass.grassitem.GrassItem;
+import life.grass.grassitem.GrassJson;
+import life.grass.grassitem.ItemBuilder;
+import life.grass.grassitem.ItemData.WeaponSkill;
 import life.grass.grassitem.JsonHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -82,6 +86,14 @@ public class Damager extends DressedEntity {
                 item = JsonHandler.damageItem(item);
                 player.getInventory().setItemInMainHand(item);
                 player.updateInventory();
+
+                //武器スキル反映
+                GrassJson grassJson = JsonHandler.getGrassJson(item);
+                if(grassJson.hasDynamicValue("WeaponSkill/Type")) {
+                    double bonus = WeaponSkill.getSkill(grassJson.getDynamicValue("WeaponSkill/Type").getAsMaskedString().orElse("")).apply(player);
+                    System.out.println("Bonus " + bonus);
+                    damage += bonus;
+                }
             }
         }
 
